@@ -18,6 +18,9 @@ const components = {
   code: Code,
   h2: Heading,
   inlineCode: InlineCode,
+  img: (props) => {
+    return <Image draggable="false" p="4" src={props.src} alt={props.alt} />
+  },
 }
 const BlogPage = ({ source, frontMatter }: any) => {
   console.log(frontMatter)
