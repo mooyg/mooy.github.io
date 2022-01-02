@@ -38,6 +38,8 @@ const BlogPage = ({ source, frontMatter }: any) => {
           images: [
             {
               url: frontMatter.headerURL,
+              width: 800,
+              height: 600,
             },
           ],
         }}
