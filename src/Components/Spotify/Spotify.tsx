@@ -1,4 +1,13 @@
-import { Button, Flex, FlexProps, IconButton, Image, Text, Tooltip } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  FlexProps,
+  IconButton,
+  Image,
+  Text,
+  Tooltip,
+  useColorMode,
+} from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import { Cross2Icon } from '@modulz/radix-icons'
@@ -24,18 +33,18 @@ type SpotifySong = {
 export const Spotify = () => {
   const [nowPlaying, setNowPlaying] = useState(false)
   const [songPlaying, setSongPlaying] = useState<SpotifySong>()
-
+  console.log(songPlaying)
   useEffect(() => {
     ;(async () => {
       const { data } = await axios.get<SpotifySong>('/api/spotify')
       if (data.notPlaying) setSongPlaying(null)
       setSongPlaying(data)
-      console.log(data)
     })()
   }, [])
   const showNowPlaying = () => {
     setNowPlaying(true)
   }
+  const { colorMode } = useColorMode()
   return (
     <>
       {!nowPlaying && (
@@ -66,7 +75,7 @@ export const Spotify = () => {
         {nowPlaying && (
           <MotionFlex
             rounded={'2xl'}
-            bg={'black'}
+            bg={colorMode === 'dark' ? '#393E46' : 'blackAlpha.300'}
             p="5"
             position="fixed"
             bottom={[2, 4, 0]}
@@ -85,12 +94,16 @@ export const Spotify = () => {
               draggable={'false'}
               src="https://i.ibb.co/MBqrdTC/spotify-logo-png-7053.png"
             />
-            <Text color={'gray.300'} as="a" fontWeight={'medium'}>
+            <Text
+              color={colorMode === 'dark' ? 'primary.text' : 'black'}
+              as="a"
+              fontWeight={'medium'}
+            >
               {songPlaying && songPlaying.notPlaying ? (
                 'Not Playing anything'
               ) : (
                 <>
-                  {songPlaying.item.name} -{' '}
+                  {songPlaying.item.name} -
                   {songPlaying.item.artists.map((artist) => (
                     <>{artist.name}</>
                   ))}
@@ -104,7 +117,7 @@ export const Spotify = () => {
                   variant={'ghost'}
                   aria-label="Close"
                 >
-                  <Cross2Icon />
+                  <Cross2Icon color="black" />
                 </IconButton>
               </Tooltip>
             </Flex>
