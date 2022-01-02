@@ -8,23 +8,12 @@ import rehypeSlug from 'rehype-slug'
 import { serialize } from 'next-mdx-remote/serialize'
 import { MDXRemote } from 'next-mdx-remote'
 import { Code } from '../../Components/ui/Code'
-import {
-  Box,
-  Center,
-  Container,
-  Flex,
-  HStack,
-  Image,
-  Tag,
-  Text,
-  Code as ChakraCode,
-} from '@chakra-ui/react'
+import { Center, Container, Flex, Image, Tag, Text } from '@chakra-ui/react'
 import { Layout } from '../../Components/layout/Layout'
-import { NextChakraLink } from '../../Components/ui/NextChakraLink'
 import { Heading } from '../../Components/ui/Heading'
 import { format } from 'date-fns'
 import { InlineCode } from '../../Components/ui/InlineCode'
-
+import { NextSeo } from 'next-seo'
 const components = {
   code: Code,
   h2: Heading,
@@ -33,28 +22,46 @@ const components = {
 const BlogPage = ({ source, frontMatter }: any) => {
   console.log(frontMatter)
   return (
-    <Layout>
-      <Container maxW={'container.lg'}>
-        <article>
-          <Center flexDir={'column'}>
-            <Heading>{frontMatter.title}</Heading>
-            <Text my="2">{frontMatter.summary}</Text>
-            <Text fontSize="sm" color="gray.400">
-              {format(new Date(frontMatter.date), 'MMMM dd, yyyy')}
-            </Text>
-            <Flex flexWrap="wrap">
-              {frontMatter.tags.split(',').map((item: string, index: number) => (
-                <Tag mx={'2'} my={'1'} key={index}>
-                  {item}
-                </Tag>
-              ))}
-            </Flex>
-            <Image src={frontMatter.headerURL} />
-          </Center>
-          <MDXRemote {...source} components={components} />
-        </article>
-      </Container>
-    </Layout>
+    <>
+      <NextSeo
+        title={frontMatter.title}
+        description={frontMatter.summary}
+        canonical={`https://mooy.vercel.app/${frontMatter.slug}`}
+        openGraph={{
+          url: `https://mooy.vercel.app/${frontMatter.slug}`,
+          title: frontMatter.title,
+          description: frontMatter.summary,
+          site_name: 'mooy',
+          images: [
+            {
+              url: frontMatter.headerURL,
+            },
+          ],
+        }}
+      />
+      <Layout>
+        <Container maxW={'container.lg'}>
+          <article>
+            <Center flexDir={'column'}>
+              <Heading>{frontMatter.title}</Heading>
+              <Text my="2">{frontMatter.summary}</Text>
+              <Text fontSize="sm" color="gray.400">
+                {format(new Date(frontMatter.date), 'MMMM dd, yyyy')}
+              </Text>
+              <Flex flexWrap="wrap">
+                {frontMatter.tags.split(',').map((item: string, index: number) => (
+                  <Tag mx={'2'} my={'1'} key={index}>
+                    {item}
+                  </Tag>
+                ))}
+              </Flex>
+              <Image src={frontMatter.headerURL} />
+            </Center>
+            <MDXRemote {...source} components={components} />
+          </article>
+        </Container>
+      </Layout>
+    </>
   )
 }
 export default BlogPage
