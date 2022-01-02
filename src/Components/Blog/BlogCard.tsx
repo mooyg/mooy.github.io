@@ -1,25 +1,33 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import { Box, Container, Flex, Heading, HStack, Image, Tag, Text, VStack } from '@chakra-ui/react'
+import {
+  Box,
+  Container,
+  Flex,
+  FlexProps,
+  Heading,
+  HStack,
+  Image,
+  Tag,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
 import { format } from 'date-fns'
 import { NextChakraLink } from '../ui/NextChakraLink'
-
+import { motion } from 'framer-motion'
 type Props = {
   frontmatter: {
     [key: string]: any
   }
   slug: string
 }
+
+export const MotionFlex = motion<FlexProps>(Flex)
+
 export const BlogCard = ({ frontmatter, slug }: Props) => {
   return (
     <NextChakraLink href={`/blog/${slug}`}>
-      <Flex
-        transition={'0.6s'}
-        _hover={{ textDecor: 'none', transform: 'translate(0px,-10px)' }}
-        p="4"
-        direction="column"
-        justify="space-between"
-      >
+      <MotionFlex p="4" direction="column" justify="space-between" whileHover={{ y: -5 }}>
         <Box>
           <HStack justify="space-between" spacing={'10'}>
             <Text
@@ -45,7 +53,7 @@ export const BlogCard = ({ frontmatter, slug }: Props) => {
             ))}
           </Flex>
         </Box>
-      </Flex>
+      </MotionFlex>
     </NextChakraLink>
   )
 }
