@@ -1,11 +1,38 @@
 import { Button, Flex, FlexProps, IconButton, Image, Text, Tooltip } from '@chakra-ui/react'
 import { AnimatePresence, motion } from 'framer-motion'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Cross2Icon } from '@modulz/radix-icons'
+import axios from 'axios'
 export const MotionFlex = motion<FlexProps>(Flex)
+type SpotifyArtists = {
+  external_urls: {
+    spotify: string
+  }
+  name: string
+}
 
+type SpotifySong = {
+  item?: {
+    name: string
+    artists: SpotifyArtists[]
+    external_urls: {
+      spotify: string
+    }
+  }
+  notPlaying: boolean
+}
 export const Spotify = () => {
   const [nowPlaying, setNowPlaying] = useState(false)
+  const [songPlaying, setSongPlaying] = useState<SpotifySong>()
+
+  useEffect(() => {
+    ;(async () => {
+      const { data } = await axios.get<SpotifySong>('/api/spotify')
+      if (data.notPlaying) setSongPlaying(null)
+      setSongPlaying(data)
+      console.log(data)
+    })()
+  }, [])
   const showNowPlaying = () => {
     setNowPlaying(true)
   }
@@ -50,6 +77,7 @@ export const Spotify = () => {
             justify={'center'}
             alignItems={'center'}
             zIndex={1}
+            maxW={'lg'}
           >
             <Image
               mr="4"
@@ -57,7 +85,18 @@ export const Spotify = () => {
               draggable={'false'}
               src="https://i.ibb.co/MBqrdTC/spotify-logo-png-7053.png"
             />
-            <Text>Now Playing - Song Playing</Text>
+            <Text color={'gray.300'} as="a" fontWeight={'medium'}>
+              {songPlaying && songPlaying.notPlaying ? (
+                'Not Playing anything'
+              ) : (
+                <>
+                  {songPlaying.item.name} -{' '}
+                  {songPlaying.item.artists.map((artist) => (
+                    <>{artist.name}</>
+                  ))}
+                </>
+              )}
+            </Text>
             <Flex position="absolute" bottom="100%" right={0}>
               <Tooltip label="Close">
                 <IconButton

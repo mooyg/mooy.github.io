@@ -7,23 +7,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const basic = Buffer.from(
     `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
   ).toString('base64')
+  const { data } = await axios({
+    method: 'POST',
+    url: 'https://accounts.spotify.com/api/token',
+    headers: {
+      Authorization: `Basic ${basic}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    params: {
+      refresh_token: process.env.SPOTIFY_REFRESH_TOKEN,
+      grant_type: 'refresh_token',
+    },
+  })
   try {
-    console.log(process.env.SPOTIFY_REFRESH_TOKEN)
-    const { data } = await axios({
-      method: 'post',
-      url: 'https://accounts.spotify.com/api/token',
-      params: {
-        grant_type: 'authorization_code',
-        code: process.env.SPOTIFY_REFRESH_TOKEN,
-        redirect_uri: 'http://localhost:3000/api/authorize',
-      },
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
-        ).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    })
     const { data: userPlayData } = await axios({
       method: 'GET',
       url: 'https://api.spotify.com/v1/me/player/currently-playing',
@@ -31,8 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         Authorization: `Bearer ${data.access_token}`,
       },
     })
-    console.log(userPlayData)
-    return res.json(userPlayData)
+    userPlayData.length === 0 ? res.json({ notPlaying: true }) : res.json(userPlayData)
   } catch (err) {
     console.log(err)
   }
