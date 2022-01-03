@@ -29,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     })
 
-    if (typeof userPlayData === 'string') return res.json({ notPlaying: true })
+    if (typeof userPlayData === 'string') return res.json(null)
     const { data: songData } = await axios.request<Spotifysong>({
       method: 'GET',
       url: `https://api.spotify.com/v1/tracks/${userPlayData.item.id}`,
@@ -39,7 +39,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     res.json({
-      songURL: userPlayData.item.externalUrls.spotify,
+      songURL: userPlayData.item.external_urls.spotify,
       songName: userPlayData.item.name,
       songArtists: userPlayData.item.artists.map((artist) => ({
         artistName: artist.name,

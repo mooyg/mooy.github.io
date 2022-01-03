@@ -1,11 +1,11 @@
 export interface Spotify {
   timestamp: number
   context: Context
-  progressMS: number
+  progress_ms: number
   item: Item
-  currentlyPlayingType: string
+  currently_playing_type: string
   actions: Actions
-  isPlaying: boolean
+  is_playing: boolean
 }
 
 export interface Actions {
@@ -17,7 +17,7 @@ export interface Disallows {
 }
 
 export interface Context {
-  externalUrls: ExternalUrls
+  external_urls: ExternalUrls
   href: string
   type: string
   uri: string
@@ -30,41 +30,41 @@ export interface ExternalUrls {
 export interface Item {
   album: Album
   artists: Artist[]
-  availableMarkets: string[]
-  discNumber: number
-  durationMS: number
+  available_markets: string[]
+  disc_number: number
+  duration_ms: number
   explicit: boolean
-  externalIDS: ExternalIDS
-  externalUrls: ExternalUrls
+  external_ids: ExternalIDS
+  external_urls: ExternalUrls
   href: string
   id: string
-  isLocal: boolean
+  is_local: boolean
   name: string
   popularity: number
-  previewURL: string
-  trackNumber: number
+  preview_url: string
+  track_number: number
   type: string
   uri: string
 }
 
 export interface Album {
-  albumType: string
+  album_type: string
   artists: Artist[]
-  availableMarkets: string[]
-  externalUrls: ExternalUrls
+  available_markets: string[]
+  external_urls: ExternalUrls
   href: string
   id: string
   images: Image[]
   name: string
-  releaseDate: Date
-  releaseDatePrecision: string
-  totalTracks: number
+  release_date: string
+  release_date_precision: string
+  total_tracks: number
   type: string
   uri: string
 }
 
 export interface Artist {
-  externalUrls: ExternalUrls
+  external_urls: ExternalUrls
   href: string
   id: string
   name: string
@@ -76,6 +76,10 @@ export interface Image {
   height: number
   url: string
   width: number
+}
+
+export interface ExternalIDS {
+  isrc: string
 }
 
 export interface ExternalIDS {

@@ -4,6 +4,7 @@ import {
   FlexProps,
   IconButton,
   Image,
+  Link,
   Text,
   Tooltip,
   useColorMode,
@@ -13,37 +14,37 @@ import React, { useEffect, useState } from 'react'
 import { Cross2Icon } from '@modulz/radix-icons'
 import axios from 'axios'
 export const MotionFlex = motion<FlexProps>(Flex)
-type SpotifyArtists = {
-  external_urls: {
-    spotify: string
-  }
-  name: string
+
+interface Spotify {
+  songURL: string
+  songName: string
+  songArtists: SongArtist[]
+  songImage: SongImage
 }
 
-type SpotifySong = {
-  item?: {
-    name: string
-    artists: SpotifyArtists[]
-    external_urls: {
-      spotify: string
-    }
-  }
-  notPlaying: boolean
+interface SongArtist {
+  artistName: string
+  artistURL: string
 }
+
+interface SongImage {
+  height: number
+  url: string
+  width: number
+}
+
 export const Spotify = () => {
   const [nowPlaying, setNowPlaying] = useState(false)
-  const [songPlaying, setSongPlaying] = useState<SpotifySong>()
+  const [songPlaying, setSongPlaying] = useState<Spotify | null>()
   console.log(songPlaying)
   useEffect(() => {
     ;(async () => {
-      const { data } = await axios.get<SpotifySong>('/api/spotify')
-      if (data.notPlaying) setSongPlaying(null)
+      const { data } = await axios.get<Spotify | null>('/api/spotify')
+      if (!data) setSongPlaying(null)
       setSongPlaying(data)
     })()
   }, [])
-  const showNowPlaying = () => {
-    setNowPlaying(true)
-  }
+
   const { colorMode } = useColorMode()
   return (
     <>
@@ -60,7 +61,7 @@ export const Spotify = () => {
             bg={'black'}
             p="1"
             rounded={'2xl'}
-            onClick={showNowPlaying}
+            onClick={() => setNowPlaying(true)}
             zIndex={1}
           >
             <Image
@@ -86,7 +87,7 @@ export const Spotify = () => {
             justify={'center'}
             alignItems={'center'}
             zIndex={1}
-            maxW={'lg'}
+            maxW={'md'}
           >
             <Image
               mr="4"
@@ -94,22 +95,29 @@ export const Spotify = () => {
               draggable={'false'}
               src="https://i.ibb.co/MBqrdTC/spotify-logo-png-7053.png"
             />
-            <Text
-              color={colorMode === 'dark' ? 'primary.text' : 'black'}
-              as="a"
-              fontWeight={'medium'}
-            >
-              {songPlaying && songPlaying.notPlaying ? (
-                'Not Playing anything'
-              ) : (
-                <>
-                  {songPlaying.item.name} -
-                  {songPlaying.item.artists.map((artist) => (
-                    <>{artist.name}</>
-                  ))}
-                </>
-              )}
-            </Text>
+
+            {songPlaying ? (
+              <>
+                <Image
+                  mr="2"
+                  maxW={'10'}
+                  rounded={'lg'}
+                  src={songPlaying.songImage.url}
+                  alt="Album Cover"
+                />
+                <Link isExternal href={songPlaying.songURL}>
+                  {songPlaying.songName}
+                </Link>
+                -
+                {songPlaying.songArtists.map((artist) => (
+                  <Link mx="2" href={artist.artistURL} isExternal key={artist.artistURL}>
+                    {artist.artistName}
+                  </Link>
+                ))}
+              </>
+            ) : (
+              'Not Playing anything'
+            )}
             <Flex position="absolute" bottom="100%" right={0}>
               <Tooltip label="Close">
                 <IconButton
