@@ -3,11 +3,20 @@ import Layout from "@layouts/Layout.astro";
 import { LearningTags } from "@components/ui/LearningTags.tsx";
 import { Image } from "astro:assets";
 import AvatarImg from "@assets/avatar.jpeg";
+import Card from "@components/Card.astro";
+
 const learning = ["Kubernetes", "Golang"];
+const pinned = [
+  {
+    title: "Dotnix",
+    url: "https://github.com/mooyg/dotnix",
+    description: "Home manager & NixOS setup with nix :)",
+  },
+];
 ---
 
 <Layout>
-  <main class="flex justify-center w-full">
+  <main class="flex justify-center w-full flex-col">
     <div class="flex flex-col gap-2 w-full px-6 mt-10">
       <div class="flex md:flex-row flex-col gap-8 justify-around items-center">
         <div class="flex flex-col gap-2 max-w-2xl">
@@ -22,10 +31,25 @@ const learning = ["Kubernetes", "Golang"];
             Building software and solving problems
           </p>
           <div class="mt-2 flex-col flex gap-2">
-            <h2 class="text-2xl lg:text-3xl sm:text-4xl font-bold">
+            <h2 class="text-2xl lg:text-3xl sm:text-4xl font-bold mb-2">
               Stuff I am trying as of now.
             </h2>
             <LearningTags learning={learning} />
+
+            <h2 class="text-2xl lg:text-3xl sm:text-4xl font-bold mb-2">
+              Pinned
+            </h2>
+            {
+              pinned.map((p) => {
+                return (
+                  <Card
+                    url={p.url}
+                    title={p.title}
+                    description={p.description}
+                  />
+                );
+              })
+            }
           </div>
         </div>
         <div class="flex flex-col gap-2 items-start justify-center">

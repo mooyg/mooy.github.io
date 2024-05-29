@@ -8,6 +8,7 @@ export const setTheme = (variant: "light" | "dark") => {
   localStorage.setItem("theme", variant);
 
   const themeValue = localStorage.getItem("theme") as "dark" | "light";
+
   if (themeValue) {
     return themeValue === "dark"
       ? document.documentElement.classList.add("dark")

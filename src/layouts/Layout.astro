@@ -13,12 +13,12 @@ const { title } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>mooy</title>
   </head>
-  <body class="h-full flex text-ui-fg-base transition-colors">
-    <div class="w-full layout-grid">
-      <div class="flex flex-col items-center w-full relative">
-        <Navbar />
-        <slot />
-      </div>
+  <body
+    class="flex text-ui-fg-base transition-colors h-full min-h-screen layout-grid"
+  >
+    <div class="flex flex-col items-center w-full relative h-full">
+      <Navbar />
+      <slot />
     </div>
   </body>
 </html>

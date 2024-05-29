@@ -1,0 +1,20 @@
+---
+import { ArrowUpRightOnBox } from "@medusajs/icons";
+const { url, title, description } = Astro.props;
+---
+
+<a
+  href={url}
+  class="bg-ui-bg-component p-2 rounded-md border border-ui-border-base shadow-ui-bg-base relative group transition-all"
+  target="_blank"
+>
+  <h3 class="font-bold">{title}</h3>
+  <p class="font-medium text-sm text-ui-fg-subtle">
+    {description}
+  </p>
+  <span
+    class="absolute top-0 right-0 m-1 group-hover:opacity-100 opacity-0 transition bg-ui-bg-overlay p-1 rounded-md group-hover:duration-100 delay-100 ease-in-out border"
+  >
+    <ArrowUpRightOnBox />
+  </span>
+</a>
