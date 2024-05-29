@@ -1,0 +1,14 @@
+---
+import { Sun } from "@medusajs/icons";
+import { Button } from "@components/ui/Button.tsx";
+---
+
+<Button id="theme-toggle">
+  <Sun />
+</Button>
+<script>
+  import { toggleTheme } from "@scripts/theme";
+  document
+    .getElementById("theme-toggle")
+    .addEventListener("click", toggleTheme);
+</script>
