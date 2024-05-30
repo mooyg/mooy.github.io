@@ -1,0 +1,31 @@
+---
+import { ArrowUpRightOnBox } from "@medusajs/icons";
+const { url, title, description } = Astro.props;
+---
+
+<div
+  class="relative z-10 flex w-full cursor-pointer items-center overflow-hidden rounded-lg border border-ui-button-neutral p-[2px] group"
+>
+  <div
+    class="animate-rotate absolute inset-0 h-full group-hover:w-full rounded-lg tag-outline w-0"
+  >
+  </div>
+  <a
+    href={url}
+    target="_blank"
+    class="relative py-3 z-20 flex w-full rounded-md bg-ui-button-neutral p-1 px-2 text-sm hover:bg-ui-button-neutral-hover delay-100 transition ease-in-out font-medium flex-col"
+  >
+    <h3 class="font-bold">
+      {title}
+    </h3>
+    <p class="font-medium text-sm text-ui-fg-subtle">
+      {description}
+    </p>
+
+    <span
+      class="absolute top-0 right-0 m-1 group-hover:opacity-100 opacity-0 transition bg-ui-bg-overlay p-1 rounded-md group-hover:duration-100 delay-100 ease-in-out border"
+    >
+      <ArrowUpRightOnBox />
+    </span>
+  </a>
+</div>

@@ -1,0 +1,16 @@
+---
+import Layout from "@layouts/Layout.astro";
+import BlogCard from "@components/BlogCard.astro";
+const blogs = ["Linking in react native", "JWT Authentication"];
+---
+
+<Layout>
+  <div class="self-start m-2 flex flex-row gap-2">
+    <h2>Under development</h2>
+    {
+      blogs.map((b) => {
+        return <BlogCard name={b} />;
+      })
+    }
+  </div>
+</Layout>
