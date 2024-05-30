@@ -1,11 +1,11 @@
 ---
-title: 'OAuth in React Native with passportjs'
-date: '2021-08-31'
-author: 'mooy'
-headerURL: 'https://i.ibb.co/pQp9vnB/React-Native-Img-1.png'
-authorPfpURL: 'https://i.ibb.co/cwwG4x7/pfp.jpg'
-summary: 'Guide on how to setup OAuth in a React Native project'
-tags: 'React Native, ExpressJS, PassportJS'
+title: "OAuth in React Native with passportjs"
+date: "2021-08-31"
+author: "mooy"
+headerURL: "https://i.ibb.co/pQp9vnB/React-Native-Img-1.png"
+authorPfpURL: "https://i.ibb.co/cwwG4x7/pfp.jpg"
+summary: "Guide on how to setup OAuth in a React Native project"
+tags: "React Native, ExpressJS, PassportJS"
 ---
 
 ## Motivation
@@ -35,24 +35,28 @@ to setup the project we will use the init command
 to start the server and you're all good now you can have an emulator or just use the expo go app to have your app up and running you can even use your web browser if you wish.
 
 ```tsx
-import React from 'react'
-import 'react-native-gesture-handler'
-import { NavigationContainer } from '@react-navigation/native'
-import { HomeScreen } from './Screens/HomeScreen'
-import { createDrawerNavigator } from '@react-navigation/drawer'
-import { UserProfileScreen } from './Screens/UserProfileScreen'
-import { SignInScreen } from './Screens/SignInScreen'
+import React from "react";
+import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import { HomeScreen } from "./Screens/HomeScreen";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { UserProfileScreen } from "./Screens/UserProfileScreen";
+import { SignInScreen } from "./Screens/SignInScreen";
 
-const Drawer = createDrawerNavigator()
+const Drawer = createDrawerNavigator();
 
 const App = (): JSX.Element => {
-  const [isSignedIn, setIsSignedIn] = useState<boolean>(false)
+  const [isSignedIn, setIsSignedIn] = useState<boolean>(false);
 
   return (
     <NavigationContainer>
       {isSignedIn ? (
         <Drawer.Navigator initialRouteName="Home">
-          <Drawer.Screen name="Home" component={HomeScreen} options={{ headerTitle: 'Locus' }} />
+          <Drawer.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerTitle: "Locus" }}
+          />
           <Drawer.Screen name="UserProfile" component={UserProfileScreen} />
         </Drawer.Navigator>
       ) : (
@@ -61,10 +65,10 @@ const App = (): JSX.Element => {
         </>
       )}
     </NavigationContainer>
-  )
-}
+  );
+};
 
-export default App
+export default App;
 ```
 
 We're using typescript here hence the types but you can just get around without using typescript too and everything would work exactly fine 😄
@@ -288,52 +292,55 @@ export const redis = new Redis({
   family: 4,
   password: process.env.REDIS_PASSWORD,
   db: 0,
-})
+});
 ```
 
 `auth/index.ts`
 
 ```ts
-import { Router } from 'express'
-import { discordOauth } from './Strategy/discord'
-import { PassportStatic } from 'passport'
-import { PrismaClient } from '@prisma/client'
+import { Router } from "express";
+import { discordOauth } from "./Strategy/discord";
+import { PassportStatic } from "passport";
+import { PrismaClient } from "@prisma/client";
 
-export const initializeAuthRoutes = (passport: PassportStatic, db: dbType): Router => {
-  const authRouter = Router()
+export const initializeAuthRoutes = (
+  passport: PassportStatic,
+  db: dbType,
+): Router => {
+  const authRouter = Router();
 
-  authRouter.use('/discord', discordOauth(passport, prisma))
-  authRouter.use('/me', (req, res) => {
-    console.log(req.user)
+  authRouter.use("/discord", discordOauth(passport, prisma));
+  authRouter.use("/me", (req, res) => {
+    console.log(req.user);
     if (req.user) {
-      res.send(req.user)
+      res.send(req.user);
     } else {
       res.redirect(
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === "production"
           ? `${process.env.CLIENT_URL}/login`
-          : 'http://localhost:3000'
-      )
+          : "http://localhost:3000",
+      );
     }
-  })
-  return authRouter
-}
+  });
+  return authRouter;
+};
 ```
 
 `auth/Strategy/discord.ts`
 
 ```ts
-import { Router } from 'express'
-import { PassportStatic } from 'passport'
-import { Strategy } from 'passport-discord'
+import { Router } from "express";
+import { PassportStatic } from "passport";
+import { Strategy } from "passport-discord";
 
 export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
-  console.log('INSIDE DISCORD OAUTH')
-  const discordAuthRouter = Router()
-  const scope = ['identify', 'email', 'guilds', 'guilds.join']
-  let callbackURL
-  let deviceType
+  console.log("INSIDE DISCORD OAUTH");
+  const discordAuthRouter = Router();
+  const scope = ["identify", "email", "guilds", "guilds.join"];
+  let callbackURL;
+  let deviceType;
   if (process.env.NODE_ENV) {
-    callbackURL = `${process.env.CLIENT_URL}/api/auth/discord/callback`
+    callbackURL = `${process.env.CLIENT_URL}/api/auth/discord/callback`;
   }
 
   passport.use(
@@ -345,16 +352,16 @@ export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
         scope,
       },
       async (_accessToken, _refreshToken, profile, done) => {
-        console.log(profile)
+        console.log(profile);
         const findUser = await prisma.user.findFirst({
           where: {
             email: profile.email,
           },
-        })
-        console.log(findUser)
+        });
+        console.log(findUser);
         if (findUser) {
-          console.log('Already exists')
-          return done(null, findUser)
+          console.log("Already exists");
+          return done(null, findUser);
         }
         try {
           const discordUser = await prisma.user.create({
@@ -364,44 +371,48 @@ export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
               avatar: profile.avatar,
               discord_user_id: profile.id,
             },
-          })
-          return done(null, discordUser)
+          });
+          return done(null, discordUser);
         } catch (e) {
-          return done(e, undefined)
+          return done(e, undefined);
         }
-      }
-    )
-  )
-  discordAuthRouter.get('/:device', passport.authenticate('discord'), (req, _res) => {
-    console.log(req.params.device)
-    deviceType = req.params.device
-    callbackURL =
-      deviceType === 'mobileapp'
-        ? 'http://10.0.2.2:4000/api/auth/discord/callback/mobile'
-        : 'http://localhost:4000/api/auth/discord/callback/browser'
-  })
+      },
+    ),
+  );
   discordAuthRouter.get(
-    '/callback/mobile',
-    passport.authenticate('discord', { failureRedirect: '/' }),
+    "/:device",
+    passport.authenticate("discord"),
+    (req, _res) => {
+      console.log(req.params.device);
+      deviceType = req.params.device;
+      callbackURL =
+        deviceType === "mobileapp"
+          ? "http://10.0.2.2:4000/api/auth/discord/callback/mobile"
+          : "http://localhost:4000/api/auth/discord/callback/browser";
+    },
+  );
+  discordAuthRouter.get(
+    "/callback/mobile",
+    passport.authenticate("discord", { failureRedirect: "/" }),
     (req, res) => {
-      console.log('MOBILE APP HERE')
-      if (!req.user) return
-      console.log(req.user.username)
+      console.log("MOBILE APP HERE");
+      if (!req.user) return;
+      console.log(req.user.username);
       res.redirect(
-        `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`
-      )
-    }
-  )
+        `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`,
+      );
+    },
+  );
   discordAuthRouter.get(
-    '/callback/browser',
-    passport.authenticate('discord', { failureRedirect: '/' }),
+    "/callback/browser",
+    passport.authenticate("discord", { failureRedirect: "/" }),
     (_req, res) => {
-      console.log('BROWSER HERE')
-      res.redirect('http://localhost:3000')
-    }
-  )
-  return discordAuthRouter
-}
+      console.log("BROWSER HERE");
+      res.redirect("http://localhost:3000");
+    },
+  );
+  return discordAuthRouter;
+};
 ```
 
 so here I wanted to differentiate whether the request is coming from mobile or just the webpage so I just did this would love to hear if anyone has other opinions on this but this was what I could think of we will ignore the browser callbacks for now and focus on mobile.
@@ -514,17 +525,17 @@ remember the callback route for mobile that's what will help us
 
 ```ts
 discordAuthRouter.get(
-  '/callback/mobile',
-  passport.authenticate('discord', { failureRedirect: '/' }),
+  "/callback/mobile",
+  passport.authenticate("discord", { failureRedirect: "/" }),
   (req, res) => {
-    console.log('MOBILE APP HERE')
-    if (!req.user) return
-    console.log(req.user.username)
+    console.log("MOBILE APP HERE");
+    if (!req.user) return;
+    console.log(req.user.username);
     res.redirect(
-      `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`
-    )
-  }
-)
+      `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`,
+    );
+  },
+);
 ```
 
 Here we redirect to our mobile app using `exp://192.168.29.20:19000`. You'd see the port for your expo app when you launch the app in your terminal
@@ -534,18 +545,18 @@ Going back to `SignInScreen.tsx`
 
 ```ts
 const userDetails = async (url: string) => {
-  const { queryParams } = Linking.parse(url)
-  await storeData(queryParams, '@user_details')
-}
+  const { queryParams } = Linking.parse(url);
+  await storeData(queryParams, "@user_details");
+};
 
 const urlHandler = ({ url }: any) => {
-  userDetails(url)
-}
+  userDetails(url);
+};
 
 useEffect(() => {
-  Linking.addEventListener('url', urlHandler)
-  return () => Linking.removeEventListener('url', urlHandler)
-}, [])
+  Linking.addEventListener("url", urlHandler);
+  return () => Linking.removeEventListener("url", urlHandler);
+}, []);
 ```
 
 We will add this to our component now whenever we our returned back to our app from the callback route the `urlHandler` will fire which will in return
@@ -843,52 +854,55 @@ export const redis = new Redis({
   family: 4,
   password: process.env.REDIS_PASSWORD,
   db: 0,
-})
+});
 ```
 
 `auth/index.ts`
 
 ```ts
-import { Router } from 'express'
-import { discordOauth } from './Strategy/discord'
-import { PassportStatic } from 'passport'
-import { PrismaClient } from '@prisma/client'
+import { Router } from "express";
+import { discordOauth } from "./Strategy/discord";
+import { PassportStatic } from "passport";
+import { PrismaClient } from "@prisma/client";
 
-export const initializeAuthRoutes = (passport: PassportStatic, db: dbType): Router => {
-  const authRouter = Router()
+export const initializeAuthRoutes = (
+  passport: PassportStatic,
+  db: dbType,
+): Router => {
+  const authRouter = Router();
 
-  authRouter.use('/discord', discordOauth(passport, prisma))
-  authRouter.use('/me', (req, res) => {
-    console.log(req.user)
+  authRouter.use("/discord", discordOauth(passport, prisma));
+  authRouter.use("/me", (req, res) => {
+    console.log(req.user);
     if (req.user) {
-      res.send(req.user)
+      res.send(req.user);
     } else {
       res.redirect(
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === "production"
           ? `${process.env.CLIENT_URL}/login`
-          : 'http://localhost:3000'
-      )
+          : "http://localhost:3000",
+      );
     }
-  })
-  return authRouter
-}
+  });
+  return authRouter;
+};
 ```
 
 `auth/Strategy/discord.ts`
 
 ```ts
-import { Router } from 'express'
-import { PassportStatic } from 'passport'
-import { Strategy } from 'passport-discord'
+import { Router } from "express";
+import { PassportStatic } from "passport";
+import { Strategy } from "passport-discord";
 
 export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
-  console.log('INSIDE DISCORD OAUTH')
-  const discordAuthRouter = Router()
-  const scope = ['identify', 'email', 'guilds', 'guilds.join']
-  let callbackURL
-  let deviceType
+  console.log("INSIDE DISCORD OAUTH");
+  const discordAuthRouter = Router();
+  const scope = ["identify", "email", "guilds", "guilds.join"];
+  let callbackURL;
+  let deviceType;
   if (process.env.NODE_ENV) {
-    callbackURL = `${process.env.CLIENT_URL}/api/auth/discord/callback`
+    callbackURL = `${process.env.CLIENT_URL}/api/auth/discord/callback`;
   }
 
   passport.use(
@@ -900,16 +914,16 @@ export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
         scope,
       },
       async (_accessToken, _refreshToken, profile, done) => {
-        console.log(profile)
+        console.log(profile);
         const findUser = await prisma.user.findFirst({
           where: {
             email: profile.email,
           },
-        })
-        console.log(findUser)
+        });
+        console.log(findUser);
         if (findUser) {
-          console.log('Already exists')
-          return done(null, findUser)
+          console.log("Already exists");
+          return done(null, findUser);
         }
         try {
           const discordUser = await prisma.user.create({
@@ -919,44 +933,48 @@ export const discordOauth = (passport: PassportStatic, db: dbType): Router => {
               avatar: profile.avatar,
               discord_user_id: profile.id,
             },
-          })
-          return done(null, discordUser)
+          });
+          return done(null, discordUser);
         } catch (e) {
-          return done(e, undefined)
+          return done(e, undefined);
         }
-      }
-    )
-  )
-  discordAuthRouter.get('/:device', passport.authenticate('discord'), (req, _res) => {
-    console.log(req.params.device)
-    deviceType = req.params.device
-    callbackURL =
-      deviceType === 'mobileapp'
-        ? 'http://10.0.2.2:4000/api/auth/discord/callback/mobile'
-        : 'http://localhost:4000/api/auth/discord/callback/browser'
-  })
+      },
+    ),
+  );
   discordAuthRouter.get(
-    '/callback/mobile',
-    passport.authenticate('discord', { failureRedirect: '/' }),
+    "/:device",
+    passport.authenticate("discord"),
+    (req, _res) => {
+      console.log(req.params.device);
+      deviceType = req.params.device;
+      callbackURL =
+        deviceType === "mobileapp"
+          ? "http://10.0.2.2:4000/api/auth/discord/callback/mobile"
+          : "http://localhost:4000/api/auth/discord/callback/browser";
+    },
+  );
+  discordAuthRouter.get(
+    "/callback/mobile",
+    passport.authenticate("discord", { failureRedirect: "/" }),
     (req, res) => {
-      console.log('MOBILE APP HERE')
-      if (!req.user) return
-      console.log(req.user.username)
+      console.log("MOBILE APP HERE");
+      if (!req.user) return;
+      console.log(req.user.username);
       res.redirect(
-        `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`
-      )
-    }
-  )
+        `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`,
+      );
+    },
+  );
   discordAuthRouter.get(
-    '/callback/browser',
-    passport.authenticate('discord', { failureRedirect: '/' }),
+    "/callback/browser",
+    passport.authenticate("discord", { failureRedirect: "/" }),
     (_req, res) => {
-      console.log('BROWSER HERE')
-      res.redirect('http://localhost:3000')
-    }
-  )
-  return discordAuthRouter
-}
+      console.log("BROWSER HERE");
+      res.redirect("http://localhost:3000");
+    },
+  );
+  return discordAuthRouter;
+};
 ```
 
 so here I wanted to differentiate whether the request is coming from mobile or just the webpage so I just did this would love to hear if anyone has other opinions on this but this was what I could think of we will ignore the browser callbacks for now and focus on mobile.
@@ -1069,17 +1087,17 @@ remember the callback route for mobile that's what will help us
 
 ```ts
 discordAuthRouter.get(
-  '/callback/mobile',
-  passport.authenticate('discord', { failureRedirect: '/' }),
+  "/callback/mobile",
+  passport.authenticate("discord", { failureRedirect: "/" }),
   (req, res) => {
-    console.log('MOBILE APP HERE')
-    if (!req.user) return
-    console.log(req.user.username)
+    console.log("MOBILE APP HERE");
+    if (!req.user) return;
+    console.log(req.user.username);
     res.redirect(
-      `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`
-    )
-  }
-)
+      `exp://192.168.29.20:19000?username=${req.user.username}&id=${req.user.id}&avatar=${req.user.avatar}&email=${req.user.email}&discordUserId=${req.user.discord_user_id}`,
+    );
+  },
+);
 ```
 
 Here we redirect to our mobile app using `exp://192.168.29.20:19000`. You'd see the port for your expo app when you launch the app in your terminal
@@ -1089,18 +1107,18 @@ Going back to `SignInScreen.tsx`
 
 ```ts
 const userDetails = async (url: string) => {
-  const { queryParams } = Linking.parse(url)
-  await storeData(queryParams, '@user_details')
-}
+  const { queryParams } = Linking.parse(url);
+  await storeData(queryParams, "@user_details");
+};
 
 const urlHandler = ({ url }: any) => {
-  userDetails(url)
-}
+  userDetails(url);
+};
 
 useEffect(() => {
-  Linking.addEventListener('url', urlHandler)
-  return () => Linking.removeEventListener('url', urlHandler)
-}, [])
+  Linking.addEventListener("url", urlHandler);
+  return () => Linking.removeEventListener("url", urlHandler);
+}, []);
 ```
 
 We will add this to our component now whenever we our returned back to our app from the callback route the `urlHandler` will fire which will in return

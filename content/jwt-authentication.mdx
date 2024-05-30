@@ -1,11 +1,11 @@
 ---
-title: 'JWT based authentication for any platform'
-date: '2021-09-25'
-author: 'mooy'
-headerURL: 'https://i.ibb.co/gzL5WYL/jwt.jpg'
-authorPfpURL: 'https://i.ibb.co/cwwG4x7/pfp.jpg'
-summary: 'Guide on how to setup OAuth on any project with JWT'
-tags: 'React, NestJS, PassportJS, JWT, Authentication'
+title: "JWT based authentication for any platform"
+date: "2021-09-25"
+author: "mooy"
+headerURL: "https://i.ibb.co/gzL5WYL/jwt.jpg"
+authorPfpURL: "https://i.ibb.co/cwwG4x7/pfp.jpg"
+summary: "Guide on how to setup OAuth on any project with JWT"
+tags: "React, NestJS, PassportJS, JWT, Authentication"
 ---
 
 ## Introduction
@@ -52,13 +52,13 @@ export class AuthModule {}
 `auth.controller.ts`
 
 ```tsx
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get } from "@nestjs/common";
 
-@Controller('/api/auth')
+@Controller("/api/auth")
 export class AuthController {
-  @Get('/')
+  @Get("/")
   async githubAuth() {
-    return 'Welcome to the jwt-auth tutorial 😊'
+    return "Welcome to the jwt-auth tutorial 😊";
   }
 }
 ```
@@ -66,7 +66,7 @@ export class AuthController {
 `auth.service.ts`
 
 ```tsx
-import { Injectable } from '@nestjs/common'
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AuthService {}
@@ -75,10 +75,10 @@ export class AuthService {}
 `app.module.ts`
 
 ```tsx
-import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
+import { Module } from "@nestjs/common";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [AuthModule],
@@ -93,35 +93,35 @@ Now we'll go ahead and setup the passport github strategy and jwt strategy
 `strategies/github-strategy.ts`
 
 ```tsx
-import { Injectable } from '@nestjs/common'
-import { PassportStrategy } from '@nestjs/passport'
-import { Strategy } from 'passport-github2'
-import 'dotenv/config'
+import { Injectable } from "@nestjs/common";
+import { PassportStrategy } from "@nestjs/passport";
+import { Strategy } from "passport-github2";
+import "dotenv/config";
 
 export interface IGithubUser {
-  username: string
-  avatar_url: string
-  emails: Email[]
+  username: string;
+  avatar_url: string;
+  emails: Email[];
 }
 
 export interface Email {
-  value: string
+  value: string;
 }
 
 @Injectable()
-export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
+export class GithubStrategy extends PassportStrategy(Strategy, "github") {
   public constructor() {
     super({
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: '/api/auth/callback',
-      scope: ['user:email'],
-    })
+      callbackURL: "/api/auth/callback",
+      scope: ["user:email"],
+    });
   }
 
   public async validate(_: string, __: any, user: IGithubUser) {
-    console.log(user)
-    return user
+    console.log(user);
+    return user;
   }
 }
 ```
@@ -160,32 +160,42 @@ you can have JWT_SECRET as any unique string.
 Now moving back to `auth.controller.ts` we'll add the callback route to it
 
 ```tsx
-import { Controller, Get, NotFoundException, Req, Res, UseGuards } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
-import { AuthService } from './auth.service'
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { AuthService } from "./auth.service";
 
-@Controller('/api/auth')
+@Controller("/api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get()
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(AuthGuard("github"))
   async githubAuth() {}
 
-  @Get('/callback')
-  @UseGuards(AuthGuard('github'))
-  async githubAuthCallback(@Req() request: Request & { user }, @Res() res: Response) {
-    const { user } = request
+  @Get("/callback")
+  @UseGuards(AuthGuard("github"))
+  async githubAuthCallback(
+    @Req() request: Request & { user },
+    @Res() res: Response,
+  ) {
+    const { user } = request;
 
     if (!user) {
-      throw new NotFoundException('No user found')
+      throw new NotFoundException("No user found");
     }
 
-    const { accessToken } = await this.authService.githubLogin(user)
+    const { accessToken } = await this.authService.githubLogin(user);
 
-    const params = new URLSearchParams({ accessToken })
+    const params = new URLSearchParams({ accessToken });
 
-    res.redirect(`http://localhost:3000?${params.toString()}`)
+    res.redirect(`http://localhost:3000?${params.toString()}`);
   }
 }
 ```
@@ -201,7 +211,7 @@ export class AuthService {
     // used Prisma as my orm with PSQL you can use anything you like and any db
     private readonly prismaService: PrismaService,
     // import { JwtService } from '@nestjs/jwt';
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   public async githubLogin(user) {
@@ -209,18 +219,18 @@ export class AuthService {
       where: {
         username: user.username,
       },
-    })
+    });
     if (userExists) {
-      return this.createJwt(userExists)
+      return this.createJwt(userExists);
     } else {
-      console.log(user)
+      console.log(user);
       const createdUser = await this.prismaService.user.create({
         data: {
           userProfilePicture: user._json.avatar_url,
           username: user.username,
         },
-      })
-      return this.createJwt(createdUser)
+      });
+      return this.createJwt(createdUser);
     }
   }
 
@@ -228,7 +238,7 @@ export class AuthService {
     return {
       // jwtService coming from @nestjs/jwt
       accessToken: this.jwtService.sign({ id }),
-    }
+    };
   }
 }
 ```
@@ -240,39 +250,49 @@ after returning the `accessToken` from `githubLogin` method we redirect back to 
 ## Starting with Authorization
 
 ```tsx
-import { Controller, Get, NotFoundException, Req, Res, UseGuards } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
-import { AuthService } from './auth.service'
-import { JwtGuard } from './jwt-guard'
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+import { AuthService } from "./auth.service";
+import { JwtGuard } from "./jwt-guard";
 
-@Controller('/api/auth')
+@Controller("/api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  @Get('/me')
+  @Get("/me")
   @UseGuards(JwtGuard)
   async getUser(@User() userId) {
     //get user from database using userId user id being
-    return await this.userService.getUser(userId)
+    return await this.userService.getUser(userId);
   }
 
   @Get()
-  @UseGuards(AuthGuard('github'))
+  @UseGuards(AuthGuard("github"))
   async githubAuth() {}
 
-  @Get('/callback')
-  @UseGuards(AuthGuard('github'))
-  async githubAuthCallback(@Req() request: Request & { user }, @Res() res: Response) {
-    const { user } = request
+  @Get("/callback")
+  @UseGuards(AuthGuard("github"))
+  async githubAuthCallback(
+    @Req() request: Request & { user },
+    @Res() res: Response,
+  ) {
+    const { user } = request;
 
     if (!user) {
-      throw new NotFoundException('No user found')
+      throw new NotFoundException("No user found");
     }
 
-    const { accessToken } = await this.authService.githubLogin(user)
+    const { accessToken } = await this.authService.githubLogin(user);
 
-    const params = new URLSearchParams({ accessToken })
+    const params = new URLSearchParams({ accessToken });
 
-    res.redirect(`http://localhost:3000?${params.toString()}`)
+    res.redirect(`http://localhost:3000?${params.toString()}`);
   }
 }
 ```
@@ -280,13 +300,15 @@ export class AuthController {
 `user.decorator.ts`
 
 ```tsx
-import { createParamDecorator, ExecutionContext, Req } from '@nestjs/common'
-import { Request } from 'express'
+import { createParamDecorator, ExecutionContext, Req } from "@nestjs/common";
+import { Request } from "express";
 
-export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
-  const request: Request = ctx.switchToHttp().getRequest()
-  return request.user
-})
+export const User = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request: Request = ctx.switchToHttp().getRequest();
+    return request.user;
+  },
+);
 ```
 
 `request.user` here is the `userId` the `JwtGuard` checks for the access token automatically if you use the Guard if you don't want to authorize just don't use the Guard
@@ -298,11 +320,11 @@ Remember? we passed the access token to url params when we redirected from our c
 Example:
 
 ```tsx
-axios.get('url', {
+axios.get("url", {
   headers: {
     Authorization: `Bearer ACCESSTOKEN`,
   },
-})
+});
 ```
 
 `ACCESSTOKEN` this being the access token you passed in the params when you redirected back to your app
