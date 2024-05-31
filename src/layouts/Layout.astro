@@ -2,6 +2,7 @@
 import "../styles/theme.css";
 import Navbar from "@components/Navbar.astro";
 import { SEO } from "astro-seo";
+import SpeedInsights from "@vercel/speed-insights/astro";
 const { title } = Astro.props;
 ---
 
@@ -20,6 +21,7 @@ const { title } = Astro.props;
   <body
     class="flex text-ui-fg-base transition-colors h-full min-h-screen layout-grid"
   >
+    <SpeedInsights />
     <div class="flex flex-col items-center w-full relative h-full">
       <Navbar />
       <slot />
