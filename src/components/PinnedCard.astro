@@ -1,6 +1,11 @@
 ---
 import { ArrowUpRightOnBox } from "@medusajs/icons";
-const { url, title, description } = Astro.props;
+import { Image } from "astro:assets";
+
+const { url, title, description, icons } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/*.svg",
+);
 ---
 
 <div
@@ -15,12 +20,20 @@ const { url, title, description } = Astro.props;
     target="_blank"
     class="relative py-3 z-20 flex w-full rounded-md bg-ui-button-neutral p-1 px-2 text-sm hover:bg-ui-button-neutral-hover delay-100 transition ease-in-out font-medium flex-col"
   >
-    <h3 class="font-bold">
-      {title}
-    </h3>
+    <span class="font-bold flex flex-row gap-2">
+      <h3 class="font-bold">
+        {title}
+      </h3>
+      {
+        icons.map((i) => {
+          return <Image src={images[`/src/assets/${i}.svg`]()} alt={i} />;
+        })
+      }
+    </span>
     <p class="font-medium text-sm text-ui-fg-subtle">
       {description}
     </p>
+    <div class="flex flex-row gap-2 items-center mt-1"></div>
 
     <span
       class="absolute top-0 right-0 m-1 group-hover:opacity-100 opacity-0 transition bg-ui-bg-overlay p-1 rounded-md group-hover:duration-100 delay-100 ease-in-out border"

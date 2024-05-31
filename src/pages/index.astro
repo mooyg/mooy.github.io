@@ -5,17 +5,28 @@ import { Image } from "astro:assets";
 import AvatarImg from "@assets/avatar.jpeg";
 import PinnedCard from "@components/PinnedCard.astro";
 
-const learning = ["Kubernetes", "Golang"];
+const learning = [
+  {
+    name: "Kubernetes",
+    icon: "kubernetes",
+  },
+  {
+    name: "Golang",
+    icon: "go",
+  },
+];
 const pinned = [
   {
     title: "Dotnix",
     url: "https://github.com/mooyg/dotnix",
     description: "Home manager & NixOS setup with nix :)",
+    icons: ["nix"],
   },
   {
     title: "Form Manager",
     url: "https://github.com/sveltecodes/form-manager.git",
     description: "A minimal form manager written in RxJS for svelte",
+    icons: ["svelte", "rxjs"],
   },
 ];
 ---
@@ -55,6 +66,7 @@ const pinned = [
                     url={p.url}
                     title={p.title}
                     description={p.description}
+                    icons={p.icons}
                   />
                 );
               })

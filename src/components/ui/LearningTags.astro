@@ -1,5 +1,11 @@
 ---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
 const { learning } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/*.svg",
+);
 ---
 
 <div class="flex flex-row gap-1">
@@ -9,8 +15,15 @@ const { learning } = Astro.props;
         <>
           <div class="relative z-10 flex w-fit cursor-pointer items-center overflow-hidden rounded-xl border border-ui-button-neutral p-[2px]">
             <div class="animate-rotate absolute inset-0 h-full w-full rounded-lg tag-outline" />
+
             <div class="relative z-20 flex w-full rounded-lg bg-ui-button-neutral p-1 px-2 text-sm hover:bg-ui-button-neutral-hover delay-100 transition ease-in-out font-medium">
-              {l}
+              <span class="flex flex-row gap-1 items-center">
+                <Image
+                  src={images[`/src/assets/${l.icon}.svg`]()}
+                  alt={l.icon}
+                />
+                {l.name}
+              </span>
             </div>
           </div>
         </>
